@@ -1,12 +1,11 @@
 # *Suppy* is my personal discord bot
 
 
-Current features:
+## Current features:
 
-* Users can delete messages in channels
-* 
+* Users can delete messages in channels.
 
-Future Additions:
+## Future Additions:
 *[] Track gas prices for different blockchain networks
 *[] Track current prices for different cryptocurrencies
 
