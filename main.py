@@ -5,6 +5,23 @@ import json
 import random
 from replit import db
 from keep_alive import keep_alive
+from discord.ext import commands
+
+
+# Set up command prefix as !
+bot = commands.Bot(command_prefix="!")
+
+# Deletes messages from channel
+@bot.command(pass_context=True, help='Deletes x amount of messages from channel where x is inputted')
+@commands.has_permissions(administrator=True)
+async def clean(ctx, limit: int):
+        await ctx.channel.purge(limit=limit)
+        await ctx.message.delete()
+
+
+
+
+
 
 client = discord.Client()
 
