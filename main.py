@@ -10,6 +10,8 @@ from discord.ext import commands
 
 bot = commands.Bot(command_prefix='!')
 
+### Main Bot Functions ###
+
 # Bot connection to the discord server
 @bot.event
 async def on_ready():
@@ -22,6 +24,8 @@ async def clean(ctx, limit: int):
         await ctx.channel.purge(limit=limit)
         await ctx.message.delete()
 
+### Game Commands ###
+
 # Flip a coin
 @bot.command(pass_context=True, help='Flips a coin')
 async def coinflip(ctx):
@@ -31,7 +35,7 @@ async def coinflip(ctx):
     else:
         await ctx.send('Tails')
 
-# Command to play a game of Rock, Paper, Scissors
+# Rock, Paper, Scissors
 @bot.command(pass_context=True, help='Play a game of Rock, Paper, Scissors')
 async def rps(ctx, choice):
     user_choice = choice.lower()
