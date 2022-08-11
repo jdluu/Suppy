@@ -1,0 +1,18 @@
+# Local Development
+*.env
+.vscode/
+
+# Config Files
+*.replit
+replit.nix
+
+# Other
+*.breakpoints
+.config/
+venv/
+
+# Packager Files
+poetry.lock
+pyproject.toml
+
+
