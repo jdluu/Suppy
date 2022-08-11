@@ -8,8 +8,12 @@ from keep_alive import keep_alive
 from discord.ext import commands
 
 
-# Set up command prefix as !
-bot = commands.Bot(command_prefix="!")
+bot = commands.Bot(command_prefix='!')
+
+# Bot connection to the discord server
+@bot.event
+async def on_ready():
+    print(f'{bot.user.name} has connected to Discord!')
 
 # Deletes messages from channel
 @bot.command(pass_context=True, help='Deletes x amount of messages from channel where x is inputted')
@@ -18,95 +22,46 @@ async def clean(ctx, limit: int):
         await ctx.channel.purge(limit=limit)
         await ctx.message.delete()
 
-
-
-
-
-
-client = discord.Client()
-
-sad_words = ["sad", "depressed", "unhappy", "angry", "miserable"]
-
-starter_encouragements = [
-  "Cheer up!",
-  "Hang in there.",
-  "You are a great person / bot!"
-]
-
-if "responding" not in db.keys():
-  db["responding"] = True
-
-def get_quote():
-  response = requests.get("https://zenquotes.io/api/random")
-  json_data = json.loads(response.text)
-  quote = json_data[0]["q"] + " -" + json_data[0]["a"]
-  return(quote)
-
-def update_encouragements(encouraging_message):
-  if "encouragements" in db.keys():
-    encouragements = db["encouragements"]
-    encouragements.append(encouraging_message)
-    db["encouragements"] = encouragements
-  else:
-    db["encouragements"] = [encouraging_message]
-
-def delete_encouragment(index):
-  encouragements = db["encouragements"]
-  if len(encouragements) > index:
-    del encouragements[index]
-  db["encouragements"] = encouragements
-
-@client.event
-async def on_ready():
-  print("We have logged in as {0.user}".format(client))
-
-@client.event
-async def on_message(message):
-  if message.author == client.user:
-    return
-
-  msg = message.content
-
-  if msg.startswith("$inspire"):
-    quote = get_quote()
-    await message.channel.send(quote)
-
-  if db["responding"]:
-    options = starter_encouragements
-    if "encouragements" in db.keys():
-      options = options + db["encouragements"]
-
-    if any(word in msg for word in sad_words):
-      await message.channel.send(random.choice(options))
-
-  if msg.startswith("$new"):
-    encouraging_message = msg.split("$new ",1)[1]
-    update_encouragements(encouraging_message)
-    await message.channel.send("New encouraging message added.")
-
-  if msg.startswith("$del"):
-    encouragements = []
-    if "encouragements" in db.keys():
-      index = int(msg.split("$del",1)[1])
-      delete_encouragment(index)
-      encouragements = db["encouragements"]
-    await message.channel.send(encouragements)
-
-  if msg.startswith("$list"):
-    encouragements = []
-    if "encouragements" in db.keys():
-      encouragements = db["encouragements"]
-    await message.channel.send(encouragements)
-    
-  if msg.startswith("$responding"):
-    value = msg.split("$responding ",1)[1]
-
-    if value.lower() == "true":
-      db["responding"] = True
-      await message.channel.send("Responding is on.")
+# Flip a coin
+@bot.command(pass_context=True, help='Flips a coin')
+async def coinflip(ctx):
+    coin = random.randint(1, 2)
+    if coin == 1:
+        await ctx.send('Heads')
     else:
-      db["responding"] = False
-      await message.channel.send("Responding is off.")
+        await ctx.send('Tails')
+
+# Command to play a game of Rock, Paper, Scissors
+@bot.command(pass_context=True, help='Play a game of Rock, Paper, Scissors')
+async def rps(ctx, choice):
+    user_choice = choice.lower()
+    bot_choice = random.choice(['rock', 'paper', 'scissors'])
+    if user_choice == bot_choice:
+        await ctx.send(f'We both chose {user_choice}! It\'s a tie!')
+    elif user_choice == 'rock':
+        if bot_choice == 'paper':
+            await ctx.send(f'I chose {bot_choice}! You lose!')
+        else:
+            await ctx.send(f'I chose {bot_choice}! You win!')
+    elif user_choice == 'paper':
+        if bot_choice == 'scissors':
+            await ctx.send(f'I chose {bot_choice}! You lose!')
+        else:
+            await ctx.send(f'I chose {bot_choice}! You win!')
+    elif user_choice == 'scissors':
+        if bot_choice == 'rock':
+            await ctx.send(f'I chose {bot_choice}! You lose!')
+        else:
+            await ctx.send(f'I chose {bot_choice}! You win!')
+    else:
+        await ctx.send(f'Invalid input! Please choose rock, paper, or scissors.')
+
+# Error Resolving Function
+@clean.error
+async def clear_error(ctx, error):
+    if isinstance(error, commands.MissingPermissions):
+        await ctx.send("You cant do that!")
 
 keep_alive()
-client.run(os.getenv("TOKEN"))
+bot.run(os.getenv("TOKEN"))
+
